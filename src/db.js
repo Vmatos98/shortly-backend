@@ -8,7 +8,6 @@ const password = process.env.password;
 const host = process.env.host;
 const port = process.env.port;
 const database = process.env.database;
-
 const db = new Pool({
     user,
     password,
