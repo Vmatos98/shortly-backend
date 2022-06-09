@@ -76,3 +76,21 @@ export async function getUser(req, res) {
         res.status(500).send(error);
     }
 }
+
+export async function getUsersRanking(req, res) {
+    try{
+        const result = await db.query(
+            `SELECT users.id, users.name, COALESCE(SUM(urls."visitCount"),0) AS "visitCount", COUNT(urls.id) AS "linksCount"
+            FROM users
+            LEFT JOIN urls
+            ON urls."userId" = users.id
+            GROUP BY users.id
+            ORDER BY "visitCount" DESC
+            LIMIT 10`);
+        if(result.rows.length > 0) {
+            res.status(200).send(result.rows);
+        }
+    }catch(error) {
+        res.status(500).send(error);
+    }
+}
