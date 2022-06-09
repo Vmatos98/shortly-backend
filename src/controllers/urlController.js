@@ -25,3 +25,26 @@ export async function shortUrl(req, res) {
         res.status(500).send(error);
     }
 }
+
+export async function getUrl(req, res) {
+    const { id } = req.params;
+    try {
+        const result = await db.query(
+        `SELECT * FROM urls WHERE id = $1`,
+        [id]
+        );
+        if (result.rows.length > 0) {
+        const objResult = {
+            "id": result.rows[0].id,
+            "shortUrl": result.rows[0].shortUrl,
+            "url": result.rows[0].url,
+        }
+        res.send(objResult).status(200);
+        
+        } else {
+        res.status(404).send("Invalid url");
+        }
+    }catch (error) {
+        res.status(404).send(error.detail);
+    }
+}
