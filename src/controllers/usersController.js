@@ -43,3 +43,36 @@ export async function userLogin(req, res) {
         res.status(500).json(error.detail);
     }
 }
+
+export async function getUser(req, res) {
+    try {
+        const { id } = req.params;
+        const user = await db.query(`SELECT users.id, users.name, SUM(urls."visitCount") AS amount 
+        FROM users 
+        JOIN urls 
+        ON urls."userId" = users.id
+        WHERE users.id = ${id}
+        GROUP BY users.id`);
+        if(user.rows.length === 0) {
+            return res.status(200).send({
+                "id" :res.locals.id,
+                "name": res.locals.name,
+                "visitCount": 0,
+                "shortenedUrls":[]
+            });
+        }
+        const data = await db.query(`SELECT id, url, "shortUrl", "visitCount"
+        FROM urls
+        WHERE "userId" = ${id}`);
+        const result = {
+            "id": user.rows[0].id,
+            "name": user.rows[0].name,
+            "visitCount": user.rows[0].amount,
+            "shortenedUrls": data.rows
+        }
+            res.status(200).send(result);
+        
+    } catch (error) {
+        res.status(500).send(error);
+    }
+}

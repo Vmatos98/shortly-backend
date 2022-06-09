@@ -65,3 +65,26 @@ export async function redirectUrl(req, res) {
         res.status(500).send(error.detail);
     }
 }
+
+export async function deleteUrl(req, res) {
+    const { id } = req.params;
+    try {
+        const result = await db.query(
+        `SELECT * 
+        FROM urls 
+        WHERE id = $1`,
+        [id]
+        );
+        if (result.rows.length > 0) {
+            if(result.rows[0].userId === res.locals){
+                await db.query(`DELETE FROM urls WHERE id = $1`, [id]);
+                return res.status(204).send("url deleted successfully");
+            }
+            return res.status(401).send("You are not authorized to delete this url");
+        } else {
+        res.status(404).send("url not found");
+        }
+    }catch (error) {
+        res.status(500).send(error.detail);
+    }
+}

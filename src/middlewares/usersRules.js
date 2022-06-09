@@ -28,3 +28,28 @@ export async function userLoginRules(req, res, next) {
         res.status(500).send(error.detail);
     }
 }
+
+export async function getUserRules(req, res, next) {
+    const { authorization } = req.headers;
+    if(!authorization){
+        res.status(401).send('Unauthorized');
+    }
+    const token = authorization.replace('Bearer ', '');
+    try{
+        const { id } = req.params;
+        const userToken = await db.query(`SELECT * FROM tokens WHERE token = $1`, [token]);
+        if(userToken.rows.length === 0 || userToken.rows[0].isValid === false){
+            res.status(401).send('token is not valid');
+            
+        }
+        const user = await db.query(`SELECT * FROM users WHERE id = $1`, [id]);
+        if(user.rows.length > 0){
+            res.locals = user.rows[0];
+        }else{
+            res.status(404).send('user not found');
+        }
+    }catch (error) {
+        res.status(500).send(error.detail);
+    }
+    next();
+}
