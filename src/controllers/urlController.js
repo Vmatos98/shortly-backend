@@ -42,9 +42,26 @@ export async function getUrl(req, res) {
         res.send(objResult).status(200);
         
         } else {
-        res.status(404).send("Invalid url");
+        res.status(404).send("url not found");
         }
     }catch (error) {
-        res.status(404).send(error.detail);
+        res.status(500).send(error.detail);
+    }
+}
+
+export async function redirectUrl(req, res) {
+    const { shortUrl } = req.params;
+    try {
+        const result = await db.query(
+        `UPDATE urls SET "visitCount" = "visitCount"+1 WHERE "shortUrl" = $1 RETURNING *`,
+        [shortUrl]
+        );
+        if (result.rows.length > 0) {
+            res.redirect(result.rows[0].url);
+        } else {
+            res.status(404).send("url not found");
+        }
+    }catch (error) {
+        res.status(500).send(error.detail);
     }
 }
