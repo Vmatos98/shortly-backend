@@ -11,3 +11,7 @@ export const loginSchema = joi.object().keys({
     email: joi.string().email().required(),
     password: joi.string().required()
 });
+
+export const urlSchema = joi.object().keys({
+    url: joi.required()
+});
