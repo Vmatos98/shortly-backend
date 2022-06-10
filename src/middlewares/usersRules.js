@@ -34,7 +34,7 @@ export async function userLoginRules(req, res, next) {
         res.status(500).send(error.detail);
     }
 }
-
+ 
 export async function getUserRules(req, res, next) {
     const { authorization } = req.headers;
     if(!authorization){
