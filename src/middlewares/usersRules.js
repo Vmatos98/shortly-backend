@@ -8,7 +8,13 @@ export async function addNewUserRules(req, res, next) {
     try {
         const { error } = signupSchema.validate(req.body);
         if(error) {
-            res.status(422).send(error.details[0].message);
+            return res.status(422).send(error.details[0].message);
+        }
+        const {email} = req.body;
+        const user = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+        if(user.rows.length > 0) {
+            res.status(422).send('email already exists');
+            
         }else{
             next();
         }

@@ -17,12 +17,11 @@ export async function addNewUser(req, res) {
         if(result.rows.length > 0) {
         res.status(201).send('User created successfully');
         }else{
-            res.status(400).send(result.detail);
+            res.status(400).send('email already exists');
         }
                 
             
     } catch (error) {
-        console.log(error);
         res.status(500).send(error);
     }
 }
